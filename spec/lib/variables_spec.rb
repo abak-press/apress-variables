@@ -5,7 +5,7 @@ describe Apress::Variables do
 
   class TestSource #раскоментировать базовый класс, когда источники будут вынесены в гем !!! < CoreSources::Base
     def self.value_as_string(params)
-      "#{params[:field]}#{params[:object]}"
+      "#{params[:field]}#{params[:object][:company_id]}"
     end
   end
 
@@ -33,13 +33,13 @@ describe Apress::Variables do
         {
           :id            => 'company_id',
           :desc          => 'ID компании',
-          :source_proc   => lambda { |view_context, company, params| company.to_s }
+          :source_proc   => ->(params, args) { params.fetch(:company_id).to_s }
         },
         {
           :id            => 'int_variable',
           :desc          => 'int_variable',
           :classes       => :all,
-          :source_proc   => lambda { |view_context, company, params| '' },
+          :source_proc   => ->(params, args) { '' },
           :type          => :integer
         },
         {
@@ -55,34 +55,34 @@ describe Apress::Variables do
           :desc          => 'redirect variable',
           :classes       => [ClassA],
           :groups        => [:group1],
-          :source_proc   => lambda { |view_context, company, params| company.to_s }
+          :source_proc   => ->(params, args) { params.fetch(:company_id).to_s }
         },
         {
           :id            => 'variable2_redirect',
           :desc          => 'redirect 2 variable',
           :classes       => ['ClassA'],
           :groups        => ['group1'],
-          :source_proc   => lambda { |view_context, company, params| company.to_s }
+          :source_proc   => ->(params, args) { params.fetch(:company_id).to_s }
         },
         {
           :id            => 'with_name',
           :name          => 'NAME',
           :classes       => [ClassB],
           :groups        => [:group2],
-          :source_proc   => lambda { |view_context, company, params| company.to_s }
+          :source_proc   => ->(params, args) { params.fetch(:company_id).to_s }
         },
         {
           :id            => 'without_name',
           :classes       => ['sdfsdfsdf'],
           :groups        => ['dsgsdgdsgds'],
-          :source_proc   => lambda { |view_context, company, params| company.to_s }
+          :source_proc   => ->(params, args) { params.fetch(:company_id).to_s }
         },
         {
           :id            => 'variable_with_params',
           :desc          => 'variable_with_params',
           :classes       => [ClassB],
           :groups        => [:group2],
-          :source_proc   => lambda { |view_context, company, params| "#{company}#{params.join('_')}" }
+          :source_proc   => ->(params, args) { "#{params.fetch(:company_id)}#{args.join('_')}" }
         },
         {
           :id            => 'variable_without_class_and_proc',
@@ -259,9 +259,8 @@ describe Apress::Variables do
       }
     end
 
-    let(:params) do
-      {:object => company_id, :view_context => 'view', :args => ['params', 1]}
-    end
+    let(:params) { {:company_id => company_id, :view_context => 'view'} }
+    let(:args) { ['params', 1] }
 
     it 'constructor correctly handles parameters.' do
       variable.each { |key, _| expect(Apress::Variables::Variable.new(variable)[key]).to eq variable[key] }
@@ -300,81 +299,86 @@ describe Apress::Variables do
       let(:int_variable) { TestList.find_by_id(:int_variable) }
 
       it 'correctly computes the value of the variable' do
-        expect(variable_with_source).to receive(:raw_value).with(params).ordered
+        expect(variable_with_source).to receive(:raw_value).with(params, args).ordered
+        expect(variable_with_source).to receive(:format).ordered
+        variable_with_source.value(params, args)
+      end
+
+      it 'args not reguired argument' do
+        expect(variable_with_source).to receive(:raw_value).with(params, []).ordered
         expect(variable_with_source).to receive(:format).ordered
         variable_with_source.value(params)
       end
 
       it 'invokes the source, if source class specified' do
         expect(TestSource).to receive(:value_as_string).and_return("returning #{company_id}")
-        expect(variable_with_source.value(params)).to eq "returning #{company_id}"
+        expect(variable_with_source.value(params, args)).to eq "returning #{company_id}"
       end
 
       context 'if the class - the source is not specified and the specified proc' do
         it 'call proc' do
           expect(variable_with_proc.source_proc)
             .to receive(:call)
-            .with(params)
-            .with('view', company_id, ['params', 1])
+            .with({:company_id => company_id, :view_context => 'view'}, ['params', 1])
             .and_return("proc returning #{company_id}")
 
-          expect(variable_with_proc.value(params)).to eq "proc returning #{company_id}"
+          expect(variable_with_proc.value(params, args)).to eq "proc returning #{company_id}"
         end
 
         it 'compute proc with method proc_value' do
           expect(variable_with_proc)
             .to receive(:proc_value)
-            .with(variable_with_proc.source_proc, params)
+            .with(variable_with_proc.source_proc, params, args)
             .and_return("proc returning #{company_id}")
 
-          expect(variable_with_proc.value(params)).to eq "proc returning #{company_id}"
+          expect(variable_with_proc.value(params, args)).to eq "proc returning #{company_id}"
         end
       end
 
       context 'when class and proc not specified' do
-        it { expect { variable_without_class_and_proc.value(params) }.to raise_error(ArgumentError) }
+        it { expect { variable_without_class_and_proc.value(params, args) }.to raise_error(ArgumentError) }
       end
 
       it 'correctly format the value of a variable, if you specify the type Integer' do
-        expect(int_variable.value(params)).to eq '0'
+        expect(int_variable.value(params, args)).to eq '0'
       end
 
       it 'correctly format the value of a variable, if variable type not specified' do
         int_variable2 = int_variable.clone
         int_variable2.delete(:type)
-        expect(int_variable2.value(params)).to eq ''
+        expect(int_variable2.value(params, args)).to eq ''
       end
     end
   end
 
   context 'integration' do
     it 'unknown variable is not replace' do
-      expect(TestParser.replace_variables(:template => 'content {unknown_var} test', :object => company_id))
+      expect(TestParser.replace_variables('content {unknown_var} test', :company_id => company_id))
         .to eq "content {unknown_var} test"
     end
 
     it 'variable with source - lambda' do
-      expect(TestParser.replace_variables(:template => 'content {company_id} test', :object => company_id))
+      expect(TestParser.replace_variables('content {company_id} test', :company_id => company_id))
         .to eq "content #{company_id} test"
     end
 
     it 'variable with source - class' do
-      expect(TestParser.replace_variables(:template => 'content {test_variable} test', :object => company_id))
+      expect(TestParser.replace_variables('content {test_variable} test', :company_id => company_id))
         .to eq "content test_field#{company_id} test"
     end
 
     it 'typed variable' do
-      expect(TestParser.replace_variables(:template => 'content {int_variable} test', :object => company_id))
+      expect(TestParser.replace_variables('content {int_variable} test', :company_id => company_id))
         .to eq "content #{0} test"
     end
 
     it 'several variables' do
-      expect(TestParser.replace_variables(:template => 'content {int_variable} test {test_variable}', :object => company_id))
+      expect(TestParser.replace_variables('content {int_variable} test {test_variable}', :company_id => company_id))
         .to eq "content #{0} test test_field#{company_id}"
     end
 
-    it 'variable with params' do
-      expect(TestParser.replace_variables(:template => "content {variable_with_params(#{params.join(', ')})} test", :object => company_id))
+    it 'variable with args' do
+      expect(TestParser.replace_variables("content {variable_with_params(#{params.join(', ')})} test", :company_id => company_id))
         .to eq "content #{company_id}#{params.join('_')} test"
     end
   end

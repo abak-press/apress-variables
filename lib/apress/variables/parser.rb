@@ -7,32 +7,26 @@ module Apress
     #
     # Examples
     #
-    #   Apress::Variables::Parser.replace_variables(:template => 'text {company_id) text',
-    #                                              :object => 1234124,
-    #                                              :view_context => self)
+    #   Apress::Variables::Parser.replace_variables('text {company_id) text', :param => 1234124)
     #   => 'text 1234124 text'
     class Parser
 
       # Public: Заменяет переменные в шаблоне подсказки на соответствующие значения.
       #
-      # params - Hash параметров:
-      #          :template - String, шаблон для замены.
-      #          :object  - Any Type, объект для которого расчитываются переменные.
-      #          :view_context - View.
+      # template - String, шаблон для замены.
+      # params   - Hash, хеш параметров необходимых для расчета переменных.
       #
-      # * Заменяет переменные вида {variable(params)}, параметров может не быть.
+      # * Заменяет переменные вида {variable(args)}, аргументов может не быть.
       #
       # Returns String.
 
-      def self.replace_variables(params)
-        return if params[:template].nil?
+      def self.replace_variables(template, params)
+        return if template.nil?
         variables_list = list_class
-        params[:template].gsub(/(\{(.+?)(\((.+?)\))?\})/) do
+        template.gsub(/(\{(.+?)(\((.+?)\))?\})/) do
           if (var = variables_list.find_by_id($2)).present?
             args = $4.to_s.split(',').map(&:strip)
-            params.except!(:template)
-            params.merge!(:args => args)
-            var.value(params)
+            var.value(params, args)
           else
             $1
           end

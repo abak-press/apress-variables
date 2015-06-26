@@ -27,16 +27,13 @@ module Apress
 
       # Public: Вычисляет и возвращает значение переменной.
       #
-      # params - Hash параметров:
-      #          :object  - Any Type, объект для которого расчитываются переменные.
-      #          :view_context - View.
-      #          :args - Массив параметров для вычисления переменной (опционально).
+      # params - Hash, параметры для которых расчитываются переменные.
+      # args   - Array - массив аргументов для вычисления переменной (опционально).
       #
       # Returns String.
 
-      def value(params)
-        params[:args] ||= []
-        format(raw_value(params))
+      def value(params, args = [])
+        format(raw_value(params, args))
       end
 
       # Public: Возвращает имя переменной.
@@ -93,10 +90,8 @@ module Apress
 
       # Protected: Вычисляет значение переменной.
       #
-      # params - Hash параметров:
-      #          :object  - Any Type, объект для которого расчитываются переменные.
-      #          :view_context - View (опционально).
-      #          :args - Массив параметров для вычисления переменной (опционально).
+      # params - Hash, параметры для которых расчитываются переменные.
+      # args   - Array - массив аргументов для вычисления переменной (опционально).
       #
       # Если для переменной задан :source_class, то получает значение через него.
       # Если класс - источник не задан, а задан :source_proc, то вычисляет через него.
@@ -104,12 +99,12 @@ module Apress
       # Returns String.
       # Raises ArgumentError если переменная имеет не корректные свойства.
 
-      def raw_value(params)
+      def raw_value(params, args)
         if (source_class = self[:source_class]).present?
-          source_params = self[:source_params].merge(:object => params[:object])
+          source_params = self[:source_params].merge(:object => params)
           source_class.value_as_string(source_params)
         elsif (source_proc = self[:source_proc]).present?
-          proc_value(source_proc, params)
+          proc_value(source_proc, params, args)
         else
           raise ArgumentError
         end
@@ -123,8 +118,8 @@ module Apress
       #
       # Returns String.
 
-      def proc_value(source_proc, params)
-        source_proc.call(params[:view_context], params[:object], params[:args])
+      def proc_value(source_proc, params, args)
+        source_proc.call(params, args)
       end
 
       def method_missing(symbol, *args)

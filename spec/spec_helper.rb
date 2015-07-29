@@ -1,11 +1,12 @@
-require 'rubygems'
 require 'bundler/setup'
-require 'rspec'
+
 require 'simplecov'
+SimpleCov.start do
+  minimum_coverage 100
+  require 'apress/variables'
+end
 
-SimpleCov.start('test_frameworks')
-
-require 'apress/variables'
+require 'rspec'
 
 # require helpers
 support_dir = File.expand_path(File.join('..', 'support'), __FILE__)

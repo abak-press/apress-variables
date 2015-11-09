@@ -35,9 +35,11 @@ module Apress
       #
       # Если переменная на найдена в списке, то генерирует исключение UnknownVariableError, если не silent.
       #
-      # Returns String.
+      # Returns ActiveSupport::SafeBuffer.
       #
       def replace_variables(template, params)
+        return ActiveSupport::SafeBuffer.new if template.nil?
+
         begin
           result = internal_replace(template.dup, params)
         rescue UnknownVariableError

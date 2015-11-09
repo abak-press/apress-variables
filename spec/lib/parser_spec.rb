@@ -44,6 +44,11 @@ describe Apress::Variables::Parser do
     list.add(var3)
   end
 
+  context "when template is nil" do
+    it { expect(parser.replace_variables(nil, company_id: company_id)).to be_empty }
+    it { expect(parser.replace_variables(nil, company_id: company_id).html_safe?).to be true }
+  end
+
   it "several variables" do
     expect(parser.replace_variables("content {int_variable} test {variable1} a", company_id: company_id))
       .to eq "content #{0} test a#{company_id}b a"

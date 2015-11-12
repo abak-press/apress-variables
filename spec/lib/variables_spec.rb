@@ -94,7 +94,7 @@ describe Apress::Variables::Variable do
     end
 
     context "when check value formating" do
-      let(:source_proc) { ->(params, arg) { nil } }
+      let(:source_proc) { ->(params, arg) { " " } }
 
       context "when type not specified" do
         context "when default specified" do
@@ -104,7 +104,7 @@ describe Apress::Variables::Variable do
         end
 
         context "when default not specified" do
-          it { expect(variable.value(params, args)).to eq "" }
+          it { expect(variable.value(params, args)).to eq " " }
         end
       end
 

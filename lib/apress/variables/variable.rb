@@ -122,7 +122,7 @@ module Apress
         when :integer
           value.to_i
         else
-          if value.nil? && default
+          if value.blank? && default
             default
           else
             value

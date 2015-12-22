@@ -1,5 +1,11 @@
 
 #### [Current]
+ * 2015-11-12 [6c43ae7](../../commit/6c43ae7) - __(TamarinEA)__ fix: return default when blank value
+ * 2015-11-09 [2265bbb](../../commit/2265bbb) - __(Artem Napolskih)__ fix: return empty string when template is nil
+ * 2015-09-23 [7bb4996](../../commit/7bb4996) - __(Artem Napolskih)__ feature: replace nested variables
+
+#### v2.0.0
+ * 2015-08-26 [5c06ca0](../../commit/5c06ca0) - __(Artem Napolskih)__ Release 2.0.0
  * 2015-07-29 [9c1669b](../../commit/9c1669b) - __(Artem Napolskih)__ feature: refactor all
  * 2015-06-26 [d6d68da](../../commit/d6d68da) - __(Artem Napolskih)__ feature: change source proc params
 

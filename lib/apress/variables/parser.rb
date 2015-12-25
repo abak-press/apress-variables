@@ -55,13 +55,18 @@ module Apress
       def internal_replace(template, params)
         return if template.nil?
 
-        # рекурсивно вычисляет переменные в выражении, начиная от самого глубоко-вложенного
-        template.gsub!(/\{(?<sub_expression>.+)(\(.+\))?\}/) do
-          "{#{internal_replace($~[:sub_expression], params)}}"
+        # заменяет простые переменные, внутри переменной
+        template.gsub!(/\{(?<sub_expression>[^{]+(\{[^{}]+\}[^{]+?)+)\}/) do
+          "{#{replace_simple_variables($~[:sub_expression], params)}}"
         end
 
-        # заменяет конкретную простую переменную на значение
-        template.gsub!(/\{(?<var>.+?)(\((?<args>.+)\))?\}/) do
+        replace_simple_variables(template, params)
+
+        template
+      end
+
+      def replace_simple_variables(template, params)
+        template.gsub!(/\{(?<var>.+?)(\((?<args>.+?)\))?\}/) do
           if (var = variables_list.find_by_id($~[:var])).present?
             args = $~[:args].to_s.split(',').map(&:strip)
             var.value(params, args)
@@ -69,8 +74,6 @@ module Apress
             raise UnknownVariableError, "Variable #{$~[:var]} not found in list"
           end
         end
-
-        template
       end
 
       def silent?

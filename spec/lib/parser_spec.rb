@@ -36,6 +36,16 @@ describe Apress::Variables::Parser do
   let(:options) { {} }
   let(:parser) { described_class.new(list, options) }
   let(:args) { [1, 4, 's', 5, 6] }
+  let(:templates) do
+    [
+      "content {int_variable} test {variable1} a",
+      "content {variable_with_args(#{args.join(', ')})} test",
+      "content {var3({variable_with_args(#{args.join(', ')})})} test",
+      "content {var3({variable1})} test",
+      "content {var3({variable_with_args(#{args.join(', ')})}sometext)} test",
+      "content {variable_with_args(c, {variable1})} test"
+    ]
+  end
 
   before do
     list.add(var0)
@@ -50,39 +60,38 @@ describe Apress::Variables::Parser do
   end
 
   it "several variables" do
-    expect(parser.replace_variables("content {int_variable} test {variable1} a", company_id: company_id))
+    expect(parser.replace_variables(templates[0], company_id: company_id))
       .to eq "content #{0} test a#{company_id}b a"
   end
 
   it "variable with args" do
-    expect(parser.replace_variables("content {variable_with_args(#{args.join(', ')})} test", company_id: company_id))
+    expect(parser.replace_variables(templates[1], company_id: company_id))
       .to eq "content #{company_id}#{args.join('_')} test"
   end
 
-  it "variable with args" do
-    expect(parser.replace_variables(
-                   "content {var3({variable_with_args(#{args.join(', ')})})} test",
-                   company_id: company_id
-    ))
-    .to eq "content var3_#{company_id}#{args.join('_')} test"
+  it "nested variable with args" do
+    expect(parser.replace_variables(templates[2], company_id: company_id))
+      .to eq "content var3_#{company_id}#{args.join('_')} test"
   end
 
   it "nested variable without args" do
-    expect(parser.replace_variables("content {var3({variable1})} test", company_id: company_id))
-    .to eq "content var3_a#{company_id}b test"
+    expect(parser.replace_variables(templates[3], company_id: company_id))
+      .to eq "content var3_a#{company_id}b test"
   end
 
   it "nested variable with args" do
-    expect(parser.replace_variables(
-                   "content {var3({variable_with_args(#{args.join(', ')})}sometext)} test",
-                   company_id: company_id
-    ))
-    .to eq "content var3_#{company_id}#{args.join('_')}sometext test"
+    expect(parser.replace_variables(templates[4], company_id: company_id))
+      .to eq "content var3_#{company_id}#{args.join('_')}sometext test"
   end
 
-  it "nested variable without args" do
-    expect(parser.replace_variables("content {var3({variable1})} test", company_id: company_id))
-    .to eq "content var3_a#{company_id}b test"
+  it "nested variable with multi args" do
+    expect(parser.replace_variables(templates[5], company_id: company_id))
+      .to eq "content #{company_id}c_a#{company_id}b test"
+  end
+
+  it "several variables with args" do
+    expect(parser.replace_variables(templates.join(' '), company_id: company_id))
+      .to eq(templates.map { |text| parser.replace_variables(text, company_id: company_id) }.join(' '))
   end
 
   context "when unknown variable" do

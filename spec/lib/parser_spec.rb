@@ -96,14 +96,19 @@ describe Apress::Variables::Parser do
 
   context "when unknown variable" do
     context "when silent = true (default)" do
-      it "nothing replaced. returns the original string" do
+      it "not replace unknown variable" do
         expect(parser.replace_variables("content {int_variable} {unknown_var} test", company_id: company_id))
-        .to eq "content {int_variable} {unknown_var} test"
+        .to eq "content 0 {unknown_var} test"
       end
 
       it "nothing replaced. returns the original string" do
         expect(parser.replace_variables("content {var3({variable11})} test", company_id: company_id))
         .to eq "content {var3({variable11})} test"
+      end
+
+      it "replace simple variable in unknown" do
+        expect(parser.replace_variables("content {variable11({var3(#{args.join(',')})})} test", company_id: company_id))
+            .to eq "content {variable11(var3_#{args.join})} test"
       end
     end
 

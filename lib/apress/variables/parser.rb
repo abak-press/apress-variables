@@ -40,12 +40,7 @@ module Apress
       def replace_variables(template, params)
         return ActiveSupport::SafeBuffer.new if template.nil?
 
-        begin
-          result = internal_replace(template.dup, params)
-        rescue UnknownVariableError
-          raise unless silent?
-          result = template
-        end
+        result = internal_replace(template.dup, params)
 
         result.try(:html_safe)
       end
@@ -66,12 +61,15 @@ module Apress
       end
 
       def replace_simple_variables(template, params)
-        template.gsub!(/\{(?<var>.+?)(\((?<args>.+?)\))?\}/) do
+        return if template.nil?
+
+        template.gsub!(/\{(?<var>[^{}]+?)(\((?<args>[^{}]+?)\))?\}/) do |substring|
           if (var = variables_list.find_by_id($~[:var])).present?
             args = $~[:args].to_s.split(',').map(&:strip)
             var.value(params, args)
           else
-            raise UnknownVariableError, "Variable #{$~[:var]} not found in list"
+            raise UnknownVariableError, "Variable #{$~[:var]} not found in list" unless silent?
+            substring
           end
         end
       end

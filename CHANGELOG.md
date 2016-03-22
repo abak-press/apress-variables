@@ -1,5 +1,10 @@
 
 #### [Current]
+ * 2016-02-18 [6b5ea32](../../commit/6b5ea32) - __(TamarinEA)__ feature: not replace only unknown variables when silent false
+ * 2015-12-25 [0136db1](../../commit/0136db1) - __(TamarinEA)__ fix(parser): parse several variables with args
+
+#### v3.0.0
+ * 2015-12-22 [533bf22](../../commit/533bf22) - __(Michael Sogomonyan)__ Release 3.0.0
  * 2015-11-12 [6c43ae7](../../commit/6c43ae7) - __(TamarinEA)__ fix: return default when blank value
  * 2015-11-09 [2265bbb](../../commit/2265bbb) - __(Artem Napolskih)__ fix: return empty string when template is nil
  * 2015-09-23 [7bb4996](../../commit/7bb4996) - __(Artem Napolskih)__ feature: replace nested variables

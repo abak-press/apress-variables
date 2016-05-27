@@ -60,6 +60,26 @@ describe Apress::Variables::Variable do
     end
   end
 
+  context "#pretty_desc" do
+    context "when string" do
+      let(:desc) { "some desc" }
+
+      it "return desc" do
+        expect(variable.pretty_desc).to eq "some desc"
+        expect(variable.pretty_desc).to be_html_safe
+      end
+    end
+
+    context "when proc" do
+      let(:desc) { -> { [1, 2, 3].join("<br />") } }
+
+      it "return desc" do
+        expect(variable.pretty_desc).to eq "1<br />2<br />3"
+        expect(variable.pretty_desc).to be_html_safe
+      end
+    end
+  end
+
   context '#value' do
     let(:params) { {:company_id => company_id} }
     let(:args) { [1, '2', 3] }

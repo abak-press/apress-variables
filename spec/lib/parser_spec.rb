@@ -31,6 +31,13 @@ describe Apress::Variables::Parser do
     end
   end
 
+  let(:var_with_error) do
+    Apress::Variables::Variable.new.tap do |v|
+      v.id = :var_with_error
+      v.source_proc = ->(params, args) { raise Apress::Variables::UnknownVariableError }
+    end
+  end
+
   let(:list) { Apress::Variables::List.new }
   let(:company_id) { rand(234) }
   let(:options) { {} }
@@ -52,6 +59,7 @@ describe Apress::Variables::Parser do
     list.add(var1)
     list.add(var2)
     list.add(var3)
+    list.add(var_with_error)
   end
 
   context "when template is nil" do
@@ -112,6 +120,17 @@ describe Apress::Variables::Parser do
       end
     end
 
+    context "when variable raise UnknownVariableError" do
+      it "rescue error when parse" do
+        expect(parser.replace_variables("content {var_with_error} test", {})).to eq "content {var_with_error} test"
+      end
+
+      it "not replace only variable with error" do
+        expect(parser.replace_variables("content {int_variable} {var_with_error(some_arg)} test", {}))
+          .to eq "content 0 {var_with_error(some_arg)} test"
+      end
+    end
+
     context "when silent = false" do
       let(:options) { {silent: false} }
 
@@ -119,6 +138,14 @@ describe Apress::Variables::Parser do
         expect do
           parser.replace_variables("content {int_variable} {unknown_var} test", company_id: company_id)
         end.to raise_error Apress::Variables::UnknownVariableError
+      end
+
+      context "when variable raise UnknownVariableError" do
+        it "raise error when parse" do
+          expect { parser.replace_variables("content {var_with_error(some_arg)} test", {}) }
+            .to raise_error(Apress::Variables::UnknownVariableError)
+            .with_message("Variable var_with_error with args some_arg not found in list")
+        end
       end
     end
   end

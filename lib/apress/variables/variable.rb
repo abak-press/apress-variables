@@ -38,6 +38,16 @@ module Apress
         (name || id).to_s
       end
 
+      # Public: Возвращает описание переменной.
+      #
+      # Позволяет задавать в desc Proc с html кодом, для удобного вывода
+      #
+      # Return String.
+      #
+      def pretty_desc
+        (desc.is_a?(Proc) ? desc.call : desc).to_s.html_safe
+      end
+
       # Public: Вычисляет и возвращает значение переменной.
       #
       # params - Hash, параметры для которых расчитываются переменные.

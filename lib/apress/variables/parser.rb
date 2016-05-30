@@ -33,7 +33,9 @@ module Apress
       # Заменяет переменные вида {variable(args)}, аргументов может не быть.
       # Заменяет вложенные переменные {variable1({variable2(args)})}
       #
-      # Если переменная на найдена в списке, то генерирует исключение UnknownVariableError, если не silent.
+      # Если опция silent - false, и переменная не найденна в списке
+      # или переменная генерирует Apress::Variables::UnknownVariableError,
+      # выкидывается исключение UnknownVariableError
       #
       # Returns ActiveSupport::SafeBuffer.
       #
@@ -64,11 +66,15 @@ module Apress
         return if template.nil?
 
         template.gsub!(/\{(?<var>[^{}]+?)(\((?<args>[^{}]+?)\))?\}/) do |substring|
-          if (var = variables_list.find_by_id($~[:var])).present?
-            args = $~[:args].to_s.split(',').map(&:strip)
-            var.value(params, args)
-          else
-            raise UnknownVariableError, "Variable #{$~[:var]} not found in list" unless silent?
+          begin
+            if (var = variables_list.find_by_id($~[:var])).present?
+              args = $~[:args].to_s.split(',').map(&:strip)
+              var.value(params, args)
+            else
+              raise UnknownVariableError
+            end
+          rescue UnknownVariableError
+            raise UnknownVariableError, "Variable #{$~[:var]} with args #{$~[:args]} not found in list" unless silent?
             substring
           end
         end

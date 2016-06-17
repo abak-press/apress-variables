@@ -1,5 +1,9 @@
 
 #### [Current]
+ * 2016-05-30 [b05c47e](../../commit/b05c47e) - __(TamarinEA)__ feature(variable): allow store proc in desc and raise unknown in source (#9)
+
+#### v4.0.0
+ * 2016-03-22 [41423b2](../../commit/41423b2) - __(TamarinEA)__ Release 4.0.0
  * 2016-02-18 [6b5ea32](../../commit/6b5ea32) - __(TamarinEA)__ feature: not replace only unknown variables when silent false
  * 2015-12-25 [0136db1](../../commit/0136db1) - __(TamarinEA)__ fix(parser): parse several variables with args
 

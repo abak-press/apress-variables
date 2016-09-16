@@ -6,7 +6,7 @@ module Apress
     # Examples
     #
     #   parser = Apress::Variables::Parser.new(variables_list)
-    #   parser.replace_variables('text {company_id) text', :param => 1234124)
+    #   parser.replace_variables('text {company_id} text', param: 1234124)
     #   => 'text 1234124 text'
     class Parser
       attr_accessor :variables_list
@@ -14,8 +14,8 @@ module Apress
 
       # Public: Конструктор.
       #
-      # variables_list - Apress::Variables::List - список переменных.
-      # options  - Hash, хеш опций:
+      # variables_list - Apress::Variables::List, список переменных.
+      # options  - Hash, настройки парсера:
       #            :silent - boolean - не генерировать исключение при неизвестной переменной
       #                                По умолчанию: true.
       # Returns Parser.
@@ -28,12 +28,12 @@ module Apress
       # Public: Заменяет переменные в шаблоне подсказки на соответствующие значения.
       #
       # template - String, шаблон для замены.
-      # params   - Hash, хеш параметров необходимых для расчета переменных.
+      # params   - Hash, параметры для вычисления переменной.
       #
       # Заменяет переменные вида {variable(args)}, аргументов может не быть.
       # Заменяет вложенные переменные {variable1({variable2(args)})}
       #
-      # Если опция silent - false, и переменная не найденна в списке
+      # Если опция silent == false и переменной нет в списке
       # или переменная генерирует Apress::Variables::UnknownVariableError,
       # выкидывается исключение UnknownVariableError
       #

@@ -12,6 +12,16 @@ module Apress
       attr_accessor :variables_list
       attr_accessor :options
 
+      class << self
+        # Public: вернуть все переменные из строки.
+        #
+        # str - String, строка с переменными
+        # Returns - Array
+        def extract_variables(str)
+          str.scan(/\{([\w:]*)/).map!(&:first)
+        end
+      end
+
       # Public: Конструктор.
       #
       # variables_list - Apress::Variables::List, список переменных.

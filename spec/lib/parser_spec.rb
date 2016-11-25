@@ -149,4 +149,22 @@ describe Apress::Variables::Parser do
       end
     end
   end
+
+  describe "#extract_variables" do
+    context "when string contains nested variables with argument" do
+      let(:str) { "Lorem ipsum dolor sit amet. Consectetur, {aaa:bbb({ccc:ddd(lol)})}? adipiscing elit!" }
+
+      it "returns all variables id" do
+        expect(described_class.extract_variables(str)).to match_array ["aaa:bbb", "ccc:ddd"]
+      end
+    end
+
+    context "when string contains simple variables" do
+      let(:str) { "Lorem ipsum dolor sit amet. Consectetur, {aaa:bbb} {ccc:ddd(lol)})? adipiscing elit!" }
+
+      it "returns all variables id" do
+        expect(described_class.extract_variables(str)).to match_array ["aaa:bbb", "ccc:ddd"]
+      end
+    end
+  end
 end

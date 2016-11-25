@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+  app:
+    volumes:
+      - .:/app
+      - ../:/localgems
+      - ssh-data:/ssh:ro
+      - bundler-data:/bundle
+
+volumes:
+  ssh-data:
+    external:
+      name: ssh_data
+
+  bundler-data:
+    external:
+      name: bundler_data

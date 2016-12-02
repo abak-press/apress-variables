@@ -18,7 +18,7 @@ module Apress
         # str - String, строка с переменными
         # Returns - Array
         def extract_variables(str)
-          str.scan(/\{([\w:]*)/).map!(&:first)
+          str.scan(/\{([\w:]*)(?:\(|\})/).map!(&:first)
         end
       end
 

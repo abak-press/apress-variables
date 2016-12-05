@@ -140,6 +140,12 @@ describe Apress::Variables::Parser do
         end.to raise_error Apress::Variables::UnknownVariableError
       end
 
+      it "ignores CSS styles" do
+        expect do
+          parser.replace_variables("content {int_variable} {color:red;} {color : green} test", company_id: company_id)
+        end.not_to raise_error Apress::Variables::UnknownVariableError
+      end
+
       context "when variable raise UnknownVariableError" do
         it "raise error when parse" do
           expect { parser.replace_variables("content {var_with_error(some_arg)} test", {}) }
@@ -153,7 +159,7 @@ describe Apress::Variables::Parser do
   describe "#extract_variables" do
     context "when string contains nested variables with argument" do
       let(:str) do
-        "р1 {color:red;} Consectetur, {aaa:bbb({ccc:ddd(lol)})}? adipiscing elit! var a = {isAdmin : true}"
+        "р1 {color:red;} Consectetur, {aaa:bbb({ccc:ddd(lol, olo)})}? adipiscing elit! var a = {isAdmin : true}"
       end
 
       it "returns all variables id" do

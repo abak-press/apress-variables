@@ -38,6 +38,13 @@ describe Apress::Variables::Parser do
     end
   end
 
+  let(:var_with_colon) do
+    Apress::Variables::Variable.new.tap do |v|
+      v.id = "test:var"
+      v.source_proc = ->(params, args) { 'test_val' }
+    end
+  end
+
   let(:list) { Apress::Variables::List.new }
   let(:company_id) { rand(234) }
   let(:options) { {} }
@@ -60,6 +67,7 @@ describe Apress::Variables::Parser do
     list.add(var2)
     list.add(var3)
     list.add(var_with_error)
+    list.add(var_with_colon)
   end
 
   context "when template is nil" do
@@ -142,7 +150,8 @@ describe Apress::Variables::Parser do
 
       it "ignores CSS styles" do
         expect do
-          parser.replace_variables("content {int_variable} {color:red;} {color : green} test", company_id: company_id)
+          parser.replace_variables("test {variable_with_args({test:var})} {test:var} {color:red;} {color : #12} test",
+                                   company_id: company_id)
         end.not_to raise_error Apress::Variables::UnknownVariableError
       end
 

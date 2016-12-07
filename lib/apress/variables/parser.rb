@@ -75,7 +75,7 @@ module Apress
       def replace_simple_variables(template, params)
         return if template.nil?
 
-        template.gsub!(/\{(?<var>[^{};\s]+?)(\((?<args>[^{}]+?)\))?\}/) do |substring|
+        template.gsub!(/\{(?<var>[a-z:_]+?)(\((?<args>[^{}]+?)\))?\}/) do |substring|
           begin
             if (var = variables_list.find_by_id($~[:var])).present?
               args = $~[:args].to_s.split(',').map(&:strip)

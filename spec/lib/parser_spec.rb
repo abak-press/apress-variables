@@ -12,7 +12,7 @@ describe Apress::Variables::Parser do
 
   let(:var1) do
     Apress::Variables::Variable.new.tap do |v|
-      v.id = :variable1
+      v.id = :variable_one
       v.source_proc = ->(params, args) { "a#{params[:company_id]}b" }
     end
   end
@@ -26,8 +26,8 @@ describe Apress::Variables::Parser do
 
   let(:var3) do
     Apress::Variables::Variable.new.tap do |v|
-      v.id = :var3
-      v.source_proc = ->(params, args) { "var3_#{args.join}" }
+      v.id = :var_three
+      v.source_proc = ->(params, args) { "var_three_#{args.join}" }
     end
   end
 
@@ -38,6 +38,13 @@ describe Apress::Variables::Parser do
     end
   end
 
+  let(:var_with_colon) do
+    Apress::Variables::Variable.new.tap do |v|
+      v.id = "test:var"
+      v.source_proc = ->(params, args) { 'test_val' }
+    end
+  end
+
   let(:list) { Apress::Variables::List.new }
   let(:company_id) { rand(234) }
   let(:options) { {} }
@@ -45,12 +52,12 @@ describe Apress::Variables::Parser do
   let(:args) { [1, 4, 's', 5, 6] }
   let(:templates) do
     [
-      "content {int_variable} test {variable1} a",
+      "content {int_variable} test {variable_one} a",
       "content {variable_with_args(#{args.join(', ')})} test",
-      "content {var3({variable_with_args(#{args.join(', ')})})} test",
-      "content {var3({variable1})} test",
-      "content {var3({variable_with_args(#{args.join(', ')})}sometext)} test",
-      "content {variable_with_args(c, {variable1})} test"
+      "content {var_three({variable_with_args(#{args.join(', ')})})} test",
+      "content {var_three({variable_one})} test",
+      "content {var_three({variable_with_args(#{args.join(', ')})}sometext)} test",
+      "content {variable_with_args(c, {variable_one})} test"
     ]
   end
 
@@ -60,6 +67,7 @@ describe Apress::Variables::Parser do
     list.add(var2)
     list.add(var3)
     list.add(var_with_error)
+    list.add(var_with_colon)
   end
 
   context "when template is nil" do
@@ -79,17 +87,17 @@ describe Apress::Variables::Parser do
 
   it "nested variable with args" do
     expect(parser.replace_variables(templates[2], company_id: company_id))
-      .to eq "content var3_#{company_id}#{args.join('_')} test"
+      .to eq "content var_three_#{company_id}#{args.join('_')} test"
   end
 
   it "nested variable without args" do
     expect(parser.replace_variables(templates[3], company_id: company_id))
-      .to eq "content var3_a#{company_id}b test"
+      .to eq "content var_three_a#{company_id}b test"
   end
 
   it "nested variable with args" do
     expect(parser.replace_variables(templates[4], company_id: company_id))
-      .to eq "content var3_#{company_id}#{args.join('_')}sometext test"
+      .to eq "content var_three_#{company_id}#{args.join('_')}sometext test"
   end
 
   it "nested variable with multi args" do
@@ -106,17 +114,18 @@ describe Apress::Variables::Parser do
     context "when silent = true (default)" do
       it "not replace unknown variable" do
         expect(parser.replace_variables("content {int_variable} {unknown_var} test", company_id: company_id))
-        .to eq "content 0 {unknown_var} test"
+          .to eq "content 0 {unknown_var} test"
       end
 
       it "nothing replaced. returns the original string" do
-        expect(parser.replace_variables("content {var3({variable11})} test", company_id: company_id))
-        .to eq "content {var3({variable11})} test"
+        expect(parser.replace_variables("content {var_three({variable_unknown})} test", company_id: company_id))
+          .to eq "content {var_three({variable_unknown})} test"
       end
 
       it "replace simple variable in unknown" do
-        expect(parser.replace_variables("content {variable11({var3(#{args.join(',')})})} test", company_id: company_id))
-            .to eq "content {variable11(var3_#{args.join})} test"
+        expect(parser.replace_variables("content {variable_unknown({var_three(#{args.join(',')})})} test",
+                                        company_id: company_id))
+          .to eq "content {variable_unknown(var_three_#{args.join})} test"
       end
     end
 
@@ -140,6 +149,22 @@ describe Apress::Variables::Parser do
         end.to raise_error Apress::Variables::UnknownVariableError
       end
 
+      context "when content contains CSS definitions" do
+        it "ignores CSS styles" do
+          expect do
+            parser.replace_variables("test {variable_with_args({test:var})} {test:var} {color:red;} {color : #12} test",
+                                     company_id: company_id)
+          end.not_to raise_error Apress::Variables::UnknownVariableError
+        end
+
+        it "replaces variables only and ignores CSS styles" do
+          expect(
+            parser.replace_variables("test {variable_with_args({test:var})} {test:var} {color:red;} {color : #12} test",
+                                     company_id: company_id)
+          ).to eq "test #{company_id}test_val test_val {color:red;} {color : #12} test"
+        end
+      end
+
       context "when variable raise UnknownVariableError" do
         it "raise error when parse" do
           expect { parser.replace_variables("content {var_with_error(some_arg)} test", {}) }
@@ -152,7 +177,9 @@ describe Apress::Variables::Parser do
 
   describe "#extract_variables" do
     context "when string contains nested variables with argument" do
-      let(:str) { "Lorem ipsum dolor sit amet. Consectetur, {aaa:bbb({ccc:ddd(lol)})}? adipiscing elit!" }
+      let(:str) do
+        "р1 {color:red;} Consectetur, {aaa:bbb({ccc:ddd(lol, olo)})}? adipiscing elit! var a = {isAdmin : true}"
+      end
 
       it "returns all variables id" do
         expect(described_class.extract_variables(str)).to match_array ["aaa:bbb", "ccc:ddd"]

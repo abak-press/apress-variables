@@ -18,7 +18,7 @@ module Apress
         # str - String, строка с переменными
         # Returns - Array
         def extract_variables(str)
-          str.scan(/\{([\w:]*)/).map!(&:first)
+          str.scan(/\{([\w:]*)(?:\(|\})/).map!(&:first)
         end
       end
 
@@ -75,7 +75,7 @@ module Apress
       def replace_simple_variables(template, params)
         return if template.nil?
 
-        template.gsub!(/\{(?<var>[^{}]+?)(\((?<args>[^{}]+?)\))?\}/) do |substring|
+        template.gsub!(/\{(?<var>[a-z:_]+?)(\((?<args>[^{}]+?)\))?\}/) do |substring|
           begin
             if (var = variables_list.find_by_id($~[:var])).present?
               args = $~[:args].to_s.split(',').map(&:strip)

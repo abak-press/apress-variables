@@ -1,5 +1,12 @@
 
 #### [Current]
+ * 2016-12-07 [ee46cc0](../../commit/ee46cc0) - __(Slava Nikulin)__ fix: regex in extract_variables method (#12)
+ * 2016-11-25 [84791f0](../../commit/84791f0) - __(slava-nikulin)__ feat: add dip, drone, docker configs
+ * 2016-11-24 [a4b34af](../../commit/a4b34af) - __(slava-nikulin)__ feat: add extract_variables method
+ * 2016-09-16 [94f650f](../../commit/94f650f) - __(Nikolay Kondratyev)__ chore(docs): исправлена документация
+
+#### v4.1.0
+ * 2016-06-17 [810cad0](../../commit/810cad0) - __(TamarinEA)__ Release 4.1.0
  * 2016-05-30 [b05c47e](../../commit/b05c47e) - __(TamarinEA)__ feature(variable): allow store proc in desc and raise unknown in source (#9)
 
 #### v4.0.0

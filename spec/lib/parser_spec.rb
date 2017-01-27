@@ -110,6 +110,33 @@ describe Apress::Variables::Parser do
       .to eq(templates.map { |text| parser.replace_variables(text, company_id: company_id) }.join(' '))
   end
 
+  context 'when have code in braces' do
+    context 'when not variable' do
+      let(:template) { '{some script/code here}' }
+
+      it 'should return safe text' do
+        expect(parser.replace_variables(template, company_id: company_id)).to eq template
+      end
+    end
+
+    context 'when nested braces' do
+      context 'when include variable' do
+        it 'should replace nested variable' do
+          expect(parser.replace_variables('{some script/code {int_variable} here}', company_id: company_id))
+            .to eq '{some script/code 0 here}'
+        end
+      end
+
+      context 'when include non variable code' do
+        let(:template) { '{some script/code {some script/code again} here}' }
+
+        it 'should return safe text' do
+          expect(parser.replace_variables(template, company_id: company_id)).to eq template
+        end
+      end
+    end
+  end
+
   context "when unknown variable" do
     context "when silent = true (default)" do
       it "not replace unknown variable" do

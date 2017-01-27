@@ -52,27 +52,27 @@ module Apress
       def replace_variables(template, params)
         return ActiveSupport::SafeBuffer.new if template.nil?
 
-        result = internal_replace(template.dup, params)
+        result = internal_replace!(template.dup, params)
 
         result.try(:html_safe)
       end
 
       private
 
-      def internal_replace(template, params)
+      def internal_replace!(template, params)
         return if template.nil?
 
         # заменяет простые переменные, внутри переменной
         template.gsub!(/\{(?<sub_expression>[^{]+(\{[^{}]+\}[^{]+?)+)\}/) do
-          "{#{replace_simple_variables($~[:sub_expression], params)}}"
+          "{#{replace_simple_variables!($~[:sub_expression], params)}}"
         end
 
-        replace_simple_variables(template, params)
+        replace_simple_variables!(template, params)
 
         template
       end
 
-      def replace_simple_variables(template, params)
+      def replace_simple_variables!(template, params)
         return if template.nil?
 
         template.gsub!(/\{(?<var>[a-z:_]+?)(\((?<args>[^{}]+?)\))?\}/) do |substring|
@@ -88,6 +88,8 @@ module Apress
             substring
           end
         end
+
+        template
       end
 
       def silent?

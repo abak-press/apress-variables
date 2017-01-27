@@ -1,5 +1,10 @@
 
 #### [Current]
+ * 2017-01-27 [aabf611](../../commit/aabf611) - __(TamarinEA)__ Release 4.2.1
+ * 2017-01-26 [e48b322](../../commit/e48b322) - __(TamarinEA)__ fix: correct parse code with nested braces
+
+#### v4.2.0
+ * 2016-12-16 [f36f60b](../../commit/f36f60b) - __(Semyon Pupkov)__ Release 4.2.0
  * 2016-12-07 [ee46cc0](../../commit/ee46cc0) - __(Slava Nikulin)__ fix: regex in extract_variables method (#12)
  * 2016-11-25 [84791f0](../../commit/84791f0) - __(slava-nikulin)__ feat: add dip, drone, docker configs
  * 2016-11-24 [a4b34af](../../commit/a4b34af) - __(slava-nikulin)__ feat: add extract_variables method

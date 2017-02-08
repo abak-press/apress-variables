@@ -60,9 +60,9 @@ module Apress
       # Raises ArgumentError если переменная имеет не корректные свойства.
       #
       def value(params, args = [])
-        if source_class.present?
+        if data_source_class.present?
           params = source_params.merge(:object => params)
-          source_class.value_as_string(params)
+          data_source_class.value_as_string(params)
         elsif source_proc.present?
           proc_value(source_proc, params, args)
         else
@@ -142,6 +142,11 @@ module Apress
 
       alias_method_chain :value, :rate
       alias_method_chain :value, :formatting
+
+      def data_source_class
+        @data_source_class ||=
+          source_class.is_a?(String) ? source_class.constantize : source_class
+      end
     end
   end
 end

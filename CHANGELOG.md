@@ -1,5 +1,10 @@
 
 #### [Current]
+ * 2017-02-10 [bee36e9](../../commit/bee36e9) - __(Salahutdinov Dmitry)__ Release 4.3.0
+ * 2017-02-08 [1494330](../../commit/1494330) - __(Salahutdinov Dmitry)__ feature: добавить возможность указать с source_class имя класса
+
+#### v4.2.1
+ * 2017-01-27 [c66ca04](../../commit/c66ca04) - __(TamarinEA)__ Update CHANGELOG.md
  * 2017-01-27 [aabf611](../../commit/aabf611) - __(TamarinEA)__ Release 4.2.1
  * 2017-01-26 [e48b322](../../commit/e48b322) - __(TamarinEA)__ fix: correct parse code with nested braces
 

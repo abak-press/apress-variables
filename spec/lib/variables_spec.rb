@@ -85,18 +85,36 @@ describe Apress::Variables::Variable do
     let(:args) { [1, '2', 3] }
 
     context "when source_class specified" do
-      let(:source_class) { TestSource }
       let(:source_params) { {:field => 'field_name'} }
 
-      it "invokes the source, if source class specified" do
-        expect(TestSource).to receive(:value_as_string).
-                                with(:field => 'field_name', :object => params).
-                                and_call_original
-        expect(variable.value(params, args)).to eq "test_source_field_name_#{company_id}"
+      context 'when source type is Class instance' do
+        let(:source_class) { TestSource }
+
+        it "invokes the source, if source class specified" do
+          expect(TestSource).to(
+            receive(:value_as_string)
+            .with(field: 'field_name', object: params)
+            .and_call_original
+          )
+          expect(variable.value(params, args)).to eq "test_source_field_name_#{company_id}"
+        end
+
+        it "args not reguired argument" do
+          expect(variable.value(params)).to eq "test_source_field_name_#{company_id}"
+        end
       end
 
-      it "args not reguired argument" do
-        expect(variable.value(params)).to eq "test_source_field_name_#{company_id}"
+      context 'when source type is String instance' do
+        let(:source_class) { 'TestSource' }
+
+        it "invokes the source, if source class specified" do
+          expect(TestSource).to(
+            receive(:value_as_string)
+            .with(field: 'field_name', object: params)
+            .and_call_original
+          )
+          expect(variable.value(params, args)).to eq "test_source_field_name_#{company_id}"
+        end
       end
     end
 

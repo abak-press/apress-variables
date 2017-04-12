@@ -51,9 +51,14 @@ module Apress
       def for_context(context)
         context_set = key_for_context(context)
 
-        result = @storage.flat_map do |key, list|
+        sorted_keys = @storage
+          .keys
+          .sort { |key| key.intersection(context_set).count }
+          .reverse!
+        result = sorted_keys.map do |key|
+          list =  @storage[key]
           list.values if key.subset?(context_set)
-        end
+        end.flatten!
 
         self.class.new(result.compact)
       end

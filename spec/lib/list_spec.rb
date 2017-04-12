@@ -101,8 +101,8 @@ describe Apress::Variables::List do
 
     it { expect(list.for_context(['user_id'])).to be_a(described_class) }
 
-    it { expect(list.for_context(['user_id']).to_a).to eq [var0, var1] }
-    it { expect(list.for_context([:user_id]).to_a).to eq [var0, var1] }
+    it { expect(list.for_context(['user_id']).to_a).to eq [var1, var0] }
+    it { expect(list.for_context([:user_id]).to_a).to eq [var1, var0] }
     it { expect(list.for_context([:user_id, 'company_id']).to_a).to match_array([var0, var1, var2, var3, var4]) }
     it do
       expect(list.for_context([:unknown_param, :user_id, 'company_id']).to_a).
@@ -111,9 +111,9 @@ describe Apress::Variables::List do
 
     it { expect(list.for_context([:unknown_param]).to_a).to eq [var0] }
 
-    it { expect(list.for_context(['company_id']).to_a).to eq [var0, var4] }
+    it { expect(list.for_context(['company_id']).to_a).to eq [var4, var0] }
 
-    it { expect(list.for_context(:company_id => 1).to_a).to eq [var0, var4] }
+    it { expect(list.for_context(:company_id => 1).to_a).to eq [var4, var0] }
   end
 
   context "#redirects" do

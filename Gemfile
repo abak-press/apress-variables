@@ -3,6 +3,6 @@ source 'https://rubygems.org'
 
 gem 'json', '~> 1.8'
 
-gem "activesupport", ">= 3.1", "<= 4.2"
+gem 'apress-documentation', git: 'git@github.com:abak-press/apress-documentation.git'
 
 gemspec

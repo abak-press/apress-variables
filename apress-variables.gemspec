@@ -20,7 +20,7 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency 'railties', '>= 3.1.0', '< 5.1'
   gem.add_dependency 'activesupport', '>= 3.1.0', '< 5.1'
-  gem.add_dependency 'apress-documentation'
+  gem.add_dependency 'apress-documentation', '>= 0.2.0'
 
   gem.add_development_dependency 'bundler'
   gem.add_development_dependency 'rake'

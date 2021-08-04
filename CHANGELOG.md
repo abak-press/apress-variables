@@ -1,6 +1,10 @@
+# v4.4.1
+
+* 2021-08-04 [8a80dfb](../../commit/8a80dfb) - __(Andrew N. Shalaev)__ Release v4.4.1 
+* 2021-08-04 [abfec3f](../../commit/abfec3f) - __(Andrew N. Shalaev)__ feature: add ruby2.4 support 
+
 # v4.4.0
 
-* 2017-09-07 [751ac91](../../commit/751ac91) - __(Denis Korobicyn)__ Release 4.4.0 
 * 2017-07-05 [1defb5c](../../commit/1defb5c) - __(Denis Korobicyn)__ chore: update dip and drone configs 
 * 2017-07-04 [484982e](../../commit/484982e) - __(Denis Korobicyn)__ feature: add apress-documentation 
 https://jira.railsc.ru/browse/PC4-19812
